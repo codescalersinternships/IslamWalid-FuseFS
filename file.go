@@ -28,7 +28,7 @@ func NewFile(content []byte) *File {
             Atime: time.Now(),
             Mtime: time.Now(),
             Ctime: time.Now(),
-            Mode:  0o777,
+            Mode:  0o444,
         },
     }
 }
@@ -46,16 +46,18 @@ func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
 	return f.Content, nil
 }
 
-
 func (f *File) Setattr(ctx context.Context, req *fuse.SetattrRequest, resp *fuse.SetattrResponse) error {
 	if req.Valid.Atime() {
 		f.Attributes.Atime = req.Atime
 	}
+
 	if req.Valid.Mtime() {
 		f.Attributes.Mtime = req.Mtime
 	}
+
 	if req.Valid.Size() {
 		f.Attributes.Size = req.Size
 	}
+
 	return nil
 }

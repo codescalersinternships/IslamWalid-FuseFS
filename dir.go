@@ -19,12 +19,19 @@ type Dir struct {
 
 var _ = (fs.Node)((*Dir)(nil))
 var _ = (fs.HandleReadDirAller)((*Dir)(nil))
+var _ = (fs.NodeSetattrer)((*File)(nil))
 var _ = (EntryGetter)((*Dir)(nil))
 
 func NewDir() *Dir {
     return &Dir{
     	Type:       fuse.DT_Dir,
-    	Attributes: fuse.Attr{Inode: 0, Atime: time.Now(), Mtime: time.Now(), Ctime: time.Now(), Mode: os.ModeDir | 0o777},
+    	Attributes: fuse.Attr{
+    		Inode:     0,
+    		Atime:     time.Now(),
+    		Mtime:     time.Now(),
+    		Ctime:     time.Now(),
+    		Mode:      os.ModeDir | 0o555,
+    	},
     	Entries:    map[string]any{},
     }
 }
@@ -58,5 +65,6 @@ func (d *Dir) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 			Name:  key,
 		})
 	}
+
 	return entries, nil
 }
