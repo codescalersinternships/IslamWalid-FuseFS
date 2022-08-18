@@ -1,4 +1,4 @@
-module main
+module IslamWalid-FuseFS
 
 go 1.19
 

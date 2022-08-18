@@ -1,4 +1,4 @@
-package main
+package fs
 
 import (
 	"context"
@@ -10,14 +10,10 @@ import (
 	"bazil.org/fuse/fs"
 )
 
-var _ = (fs.Node)((*Dir)(nil))
-var _ = (fs.HandleReadDirAller)((*Dir)(nil))
-var _ = (EntryGetter)((*Dir)(nil))
-
 type Dir struct {
 	Type       fuse.DirentType
 	Attributes fuse.Attr
-	Entries    map[string]interface{}
+	Entries    map[string]any
 }
 
 func NewDir() *Dir {
@@ -30,7 +26,7 @@ func NewDir() *Dir {
 			Ctime: time.Now(),
 			Mode:  os.ModeDir | 0o555,
 		},
-		Entries: map[string]interface{}{},
+		Entries: map[string]any{},
 	}
 }
 
