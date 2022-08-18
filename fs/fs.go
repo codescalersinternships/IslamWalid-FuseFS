@@ -11,7 +11,7 @@ import (
 )
 
 type FS struct {
-    UserStruct any
+    UserStructRef any
 }
 
 type EntryGetter interface {
@@ -20,7 +20,7 @@ type EntryGetter interface {
 
 func NewFS(userStruct any) *FS {
     return &FS{
-    	UserStruct: userStruct,
+    	UserStructRef: userStruct,
     }
 }
 
@@ -47,22 +47,24 @@ func Mount(mountPoint string, userStruct any) error {
 
 func (f *FS) Root() (fs.Node, error) {
     dir := NewDir()
-    structMap := structs.Map(f.UserStruct)
-    dir.Entries = f.createEntries(structMap)
+    structMap := structs.Map(f.UserStructRef)
+    dir.Entries = f.createEntries(structMap, []string{})
     return dir, nil
 }
 
-func (f *FS) createEntries(structMap map[string]any) map[string]any {
+func (f *FS) createEntries(structMap map[string]any, currentPath []string) map[string]any {
     entries := map[string]any{}
 
     for key, val := range structMap {
         if reflect.TypeOf(val).Kind() == reflect.Map {
             dir := NewDir()
-            dir.Entries = f.createEntries(val.(map[string]any))
+            dir.Entries = f.createEntries(val.(map[string]any), append(currentPath, key))
             entries[key] = dir
         } else {
+            filePath := make([]string, len(currentPath))
+            copy(filePath, currentPath)
             content := []byte(fmt.Sprintln(reflect.ValueOf(val)))
-            file := NewFile(key, len(content), f.UserStruct)
+            file := NewFile(key, filePath, len(content), f.UserStructRef)
             entries[key] = file
         }
     }
