@@ -17,7 +17,7 @@ type SubStruct struct {
 }
 
 func main() {
-    c, _ := fuse.Mount("./mnt", fuse.FSName("fusefs"), fuse.Subtype("tmpfs"))
+    c, _ := fuse.Mount("./mnt")
     defer c.Close()
     s := &Struct{
         String: "name",
