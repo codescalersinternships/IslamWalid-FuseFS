@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"bazil.org/fuse"
@@ -20,6 +19,7 @@ func NewFile(content []byte) *File {
 		Content: content,
 		Attributes: fuse.Attr{
 			Inode: 0,
+            Size: uint64(len(content)),
 			Atime: time.Now(),
 			Mtime: time.Now(),
 			Ctime: time.Now(),
@@ -40,7 +40,6 @@ func (f *File) Attr(ctx context.Context, a *fuse.Attr) error {
 }
 
 func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
-    fmt.Println(f.Content)
 	return f.Content, nil
 }
 
