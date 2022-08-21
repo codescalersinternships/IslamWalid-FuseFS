@@ -20,7 +20,7 @@ type subStructure struct {
 }
 
 func Routine(input *structure) {
-	time.Sleep(time.Second * 5)
+	time.Sleep(500 * time.Millisecond)
 	input.String = "new string"
 } 
 
