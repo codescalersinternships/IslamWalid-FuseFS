@@ -76,7 +76,7 @@ func (f *file) fetchFileContent() []byte {
     
     traverse = func(m map[string]any, idx int) {
         if idx == len(f.FilePath) {
-            content = []byte(fmt.Sprintln(reflect.ValueOf(m[f.FileName])))
+            content = []byte(fmt.Sprint(reflect.ValueOf(m[f.FileName])))
         } else {
             traverse(m[f.FilePath[idx]].(map[string]any), idx + 1)
         }
