@@ -10,7 +10,7 @@ import (
 	"github.com/fatih/structs"
 )
 
-type File struct {
+type file struct {
 	Type       fuse.DirentType
     FileName   string
     FilePath []string
@@ -18,9 +18,9 @@ type File struct {
     UserStructRef any
 }
 
-
-func NewFile(fileName string, filePath []string, size int, userStructRef any) *File {
-	return &File{
+// NewFile creates new empty file.
+func NewFile(fileName string, filePath []string, size int, userStructRef any) *file {
+	return &file{
 		Type:    fuse.DT_File,
         FileName: fileName,
         FilePath: filePath,
@@ -36,20 +36,22 @@ func NewFile(fileName string, filePath []string, size int, userStructRef any) *F
 	}
 }
 
-func (f *File) Attr(ctx context.Context, a *fuse.Attr) error {
+// Attr provide the core information about the file.
+func (f *file) Attr(ctx context.Context, a *fuse.Attr) error {
 	*a = f.Attributes
 	return nil
 }
 
-func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
+// ReadAll returns all the content in a file.
+func (f *file) ReadAll(ctx context.Context) ([]byte, error) {
     return f.fetchFileContent(), nil
 }
 
-func (f *File) GetDirentType() fuse.DirentType {
+func (f *file) GetDirentType() fuse.DirentType {
 	return f.Type
 }
 
-func (f *File) Setattr(ctx context.Context, req *fuse.SetattrRequest, resp *fuse.SetattrResponse) error {
+func (f *file) Setattr(ctx context.Context, req *fuse.SetattrRequest, resp *fuse.SetattrResponse) error {
 	if req.Valid.Atime() {
 		f.Attributes.Atime = req.Atime
 	}
@@ -65,7 +67,8 @@ func (f *File) Setattr(ctx context.Context, req *fuse.SetattrRequest, resp *fuse
 	return nil
 }
 
-func (f *File) fetchFileContent() []byte {
+// fetchFileContent fetch the given file for its content.
+func (f *file) fetchFileContent() []byte {
     var content []byte
     var traverse func(m map[string]any, idx int)
 

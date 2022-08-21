@@ -10,7 +10,9 @@ import (
 	"github.com/fatih/structs"
 )
 
+// FS represents file system type.
 type FS struct {
+    // Reference to the struct that the user need to represent in the file system.
     UserStructRef any
 }
 
@@ -18,12 +20,14 @@ type EntryGetter interface {
 	GetDirentType() fuse.DirentType
 }
 
+// NewFS Creates new file system object
 func NewFS(userStruct any) *FS {
     return &FS{
     	UserStructRef: userStruct,
     }
 }
 
+// Mount mounts the file system to the given mount point and starts the file system server.
 func Mount(mountPoint string, userStruct any) error {
     conn, err := fuse.Mount(mountPoint)
     if err != nil {
@@ -45,6 +49,7 @@ func Mount(mountPoint string, userStruct any) error {
     return nil
 }
 
+// Root initialize the root directory.
 func (f *FS) Root() (fs.Node, error) {
     dir := NewDir()
     structMap := structs.Map(f.UserStructRef)
@@ -52,6 +57,7 @@ func (f *FS) Root() (fs.Node, error) {
     return dir, nil
 }
 
+// createEntries creates a map of directories and files a directory have.
 func (f *FS) createEntries(structMap map[string]any, currentPath []string) map[string]any {
     entries := map[string]any{}
 

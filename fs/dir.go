@@ -10,14 +10,15 @@ import (
 	"bazil.org/fuse/fs"
 )
 
-type Dir struct {
+type dir struct {
 	Type       fuse.DirentType
 	Attributes fuse.Attr
 	Entries    map[string]any
 }
 
-func NewDir() *Dir {
-	return &Dir{
+// NewDir creates new empty directory
+func NewDir() *dir {
+	return &dir{
 		Type: fuse.DT_Dir,
 		Attributes: fuse.Attr{
 			Inode: 0,
@@ -30,12 +31,16 @@ func NewDir() *Dir {
 	}
 }
 
-func (d *Dir) Attr(ctx context.Context, a *fuse.Attr) error {
+// Attr provide the core information about the directory.
+func (d *dir) Attr(ctx context.Context, a *fuse.Attr) error {
 	*a = d.Attributes
 	return nil
 }
 
-func (d *Dir) Lookup(ctx context.Context, name string) (fs.Node, error) {
+// Lookup serve the kernel requests for specific file or directory.
+// it fetches the file system structure for the needed file of directory.
+// it returns an inode or error ENOENT if not found.
+func (d *dir) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	node, ok := d.Entries[name]
 	if ok {
 		return node.(fs.Node), nil
@@ -43,11 +48,12 @@ func (d *Dir) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	return nil, syscall.ENOENT
 }
 
-func (d *Dir) GetDirentType() fuse.DirentType {
+func (d *dir) GetDirentType() fuse.DirentType {
 	return d.Type
 }
 
-func (d *Dir) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
+// ReadDirAll reads all the content of a directory.
+func (d *dir) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 	var entries []fuse.Dirent
 
 	for k, v := range d.Entries {
