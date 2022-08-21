@@ -39,7 +39,7 @@ fi
 sleep 1
 String=$(cat ./mnt/String)
 if [[ $String != 'new string' ]]; then
-    echo 'TEST FAILED: file "String" does not match struct value'
+    echo 'TEST FAILED: file "String" was not modified'
     fusermount -zu ./mnt
     exit 1
 fi
