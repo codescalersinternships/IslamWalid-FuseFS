@@ -45,4 +45,4 @@ if [[ $String != 'new string' ]]; then
 fi
 
 fusermount -zu ./mnt
-    echo 'TEST PASSED'
+echo 'TEST PASSED'
