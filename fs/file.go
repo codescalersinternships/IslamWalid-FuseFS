@@ -39,14 +39,14 @@ func NewFile(fileName string, filePath []string, size int, userStructRef any) *f
 
 // Attr provide the core information about the file.
 func (f *file) Attr(ctx context.Context, a *fuse.Attr) error {
-    f.updateFile()
+    f.update()
 	*a = f.Attributes
 	return nil
 }
 
 // ReadAll returns all the content in a file.
 func (f *file) ReadAll(ctx context.Context) ([]byte, error) {
-    f.updateFile()
+    f.update()
     f.Attributes.Atime = time.Now() 
     return f.Content, nil
 }
@@ -71,23 +71,14 @@ func (f *file) Setattr(ctx context.Context, req *fuse.SetattrRequest, resp *fuse
 	return nil
 }
 
-// updateFile fetch the given file for its content and attributes.
-func (f *file) updateFile() {
-    var content []byte
-    var traverse func(m map[string]any, idx int)
-
+// update fetch the given file for its content and attributes.
+func (f *file) update() {
     structMap := structs.Map(f.UserStructRef)
-    
-    traverse = func(m map[string]any, idx int) {
-        if idx == len(f.FilePath) {
-            content = []byte(fmt.Sprintln(reflect.ValueOf(m[f.FileName])))
-        } else {
-            traverse(m[f.FilePath[idx]].(map[string]any), idx + 1)
-        }
+    for _, part := range f.FilePath {
+        structMap = structMap[part].(map[string]any)
     }
-
-    traverse(structMap, 0)
-
+    content := []byte(fmt.Sprintln(reflect.ValueOf(structMap[f.FileName])))
+    
     f.Content = content
     f.Attributes.Size = uint64(len(content))
 }
